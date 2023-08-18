@@ -151,4 +151,28 @@ public class JdbcDaoComuna implements ComunaDao {
         return null;
     }
 
+    @Override
+    public List<Comuna> getComunasByCiudad(Ciudad ciudad, String key) {
+        String sql = "SELECT * FROM  comuna c WHERE  c.ciudad_id = ? AND c.nombre LIKE ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, ciudad.getId());
+            preparedStatement.setString(2, "%" + key + "%");
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Comuna> comunas = new ArrayList<>();
+                while (resultSet.next()) {
+                    int comunaId = resultSet.getInt("id");
+                    String nombre = resultSet.getString("nombre");
+                    int ciudadId = resultSet.getInt("ciudad_id");
+
+                    comunas.add(new Comuna(comunaId, nombre, new Ciudad(ciudadId, null)));
+                }
+                return comunas;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

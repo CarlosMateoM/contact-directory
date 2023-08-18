@@ -1,5 +1,6 @@
 package com.software.elector.dao;
 
+import com.software.elector.model.Ciudad;
 import com.software.elector.model.Comuna;
 import java.util.List;
 
@@ -9,4 +10,5 @@ import java.util.List;
  */
 public interface ComunaDao extends GenericDao<Comuna, Integer> {
     List<Comuna> getComunasByCiudad(int id);
+    List<Comuna> getComunasByCiudad(Ciudad ciudad, String key);
 }

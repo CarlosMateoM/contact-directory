@@ -7,7 +7,6 @@ com\software\elector\model\Ciudad.class
 com\software\elector\view\form\CiudadForm$2.class
 com\software\elector\view\form\BarrioForm$1.class
 com\software\elector\view\VotantePanel$1.class
-com\software\elector\view\VotantePanel$4.class
 com\software\elector\controller\CiudadController.class
 com\software\elector\view\components\CiudadComboBox.class
 com\software\elector\enums\ValidationMessage.class
@@ -28,7 +27,6 @@ com\software\elector\view\form\BarrioForm$2.class
 com\software\elector\dao\PersonaDao.class
 com\software\elector\dao\BarrioDao.class
 com\software\elector\view\UbicacionPanel.class
-com\software\elector\view\VotantePanel$3.class
 com\software\elector\view\form\ComunaForm.class
 com\software\elector\service\GenericService.class
 com\software\elector\controller\ComunaController.class

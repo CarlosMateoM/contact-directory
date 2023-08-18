@@ -43,5 +43,10 @@ public class CiudadController {
     public void buscarCiudad(String key) {
         view.cargarCiudades(ciudadService.getByKey(key));
     }
+    
+    public String eliminarCiudad(Ciudad ciudad){
+        ciudadService.delete(ciudad.getId());
+        return ValidationMessage.CIUDAD_ELIMINADA.getMessage();
+    }
 
 }

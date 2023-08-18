@@ -131,7 +131,7 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "INNER JOIN comuna c ON b.comuna_id = c.id "
                 + "INNER JOIN ciudad c2 ON c.ciudad_id = c2.id "
                 + "WHERE nombreCompleto LIKE ? "
-                + "OR cedula LIKE ?";
+                + "OR cedula LIKE ? ORDER BY p.primer_nombre";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%" + key + "%");
@@ -228,6 +228,7 @@ public class JdbcDaoPersona implements PersonaDao {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     
+    
     @Override
     public boolean isCedulaInUse(String cedula) {
         String sql = "SELECT COUNT(*) FROM persona WHERE cedula = ?";
@@ -244,8 +245,8 @@ public class JdbcDaoPersona implements PersonaDao {
         }
         return false; 
     }
+
     
-    @Override
     public boolean isTelefonoInUse(String telefono) {
         String sql = "SELECT COUNT(*) FROM persona WHERE telefono = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

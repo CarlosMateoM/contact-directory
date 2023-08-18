@@ -62,7 +62,7 @@ public class VotanteController {
     }
 
     public void onComunaSelected(Comuna comuna) {
-        List<Barrio> barrios = barrioService.getBarrioByComuna(comuna.getId());
+        List<Barrio> barrios = barrioService.getBarriosByComuna(comuna.getId());
         form.cargarBarrios(barrios);
     }
 

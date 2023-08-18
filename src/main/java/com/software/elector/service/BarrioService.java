@@ -2,6 +2,7 @@ package com.software.elector.service;
 
 import com.software.elector.dao.BarrioDao;
 import com.software.elector.model.Barrio;
+import com.software.elector.model.Comuna;
 import java.util.List;
 
 /**
@@ -46,8 +47,12 @@ public class BarrioService implements GenericService<Barrio, Integer>{
         barrioDao.delete(id);
     }
     
-    public List<Barrio> getBarrioByComuna(int id) {
-       return barrioDao.getBarrioByComuna(id);
+    public List<Barrio> getBarriosByComuna(int id) {
+       return barrioDao.getBarriosByComuna(id);
+    }
+    
+    public List<Barrio> getBarriosByComuna(Comuna comuna, String key) {
+       return barrioDao.getBarriosByComuna(comuna, key);
     }
     
 }
