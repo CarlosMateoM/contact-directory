@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-
 /**
  *
  * @author C.Mateo
@@ -21,7 +20,9 @@ public class DatabaseUtil {
         try {
             if (connection == null || connection.isClosed()) {
                 String url = PropertiesUtil.getProperty("db.url");
-                connection = DriverManager.getConnection(url);
+                String user = PropertiesUtil.getProperty("db.user");
+                String password = PropertiesUtil.getProperty("db.password");
+                connection = DriverManager.getConnection(url, user, password);
             }
         } catch (SQLException ex) {
         }
