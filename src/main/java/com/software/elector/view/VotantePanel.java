@@ -90,6 +90,7 @@ public class VotantePanel extends javax.swing.JPanel {
                 "Nombre", "Apellidos", "Cedula", "Telefono", "Direccion", "Barrio", "Comuna", "Ciudad"
             }
         ));
+        jTableVotantes.setRowHeight(30);
         jScrollPane1.setViewportView(jTableVotantes);
 
         jButton2.setText("Nuevo");
