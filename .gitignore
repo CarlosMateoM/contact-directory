@@ -1,2 +1,7 @@
 application.properties
 software-elector-db.sqlite
+
+
+*.lst
+*.class
+*.jar
