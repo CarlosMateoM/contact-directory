@@ -6,12 +6,15 @@ import com.software.elector.model.Ciudad;
 import com.software.elector.model.Comuna;
 import com.software.elector.model.Direccion;
 import com.software.elector.model.Persona;
+import com.software.elector.util.DatabaseUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -191,30 +194,56 @@ public class JdbcDaoPersona implements PersonaDao {
 
     @Override
     public int save(Persona t) {
-        String sql = "INSERT INTO persona (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, cedula, telefono, direccion_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, t.getPrimerNombre());
-            preparedStatement.setString(2, t.getSegundoNombre());
-            preparedStatement.setString(3, t.getPrimerApellido());
-            preparedStatement.setString(4, t.getSegundoApellido());
-            preparedStatement.setString(5, t.getCedula());
-            preparedStatement.setString(6, t.getTelefono());
-            preparedStatement.setInt(7, t.getDireccion().getId());
+        String direccionSql = "INSERT INTO direccion (barrio_id, calle, carrera, numero, sobre) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        String personaSql = "INSERT INTO persona (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, cedula, telefono, direccion_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-            preparedStatement.execute();
+        try (PreparedStatement preparedStatementPersona = connection.prepareStatement(personaSql); 
+                PreparedStatement preparedStatementDirection = connection.prepareStatement(direccionSql)) {
 
-            try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    int generatedId = generatedKeys.getInt(1);  // Obtener el ID generado
-                    return generatedId;
-                } else {
-                    throw new SQLException("Error al obtener el id de la entidad insertada [persona]: " + t.toString());
-                }
-            }
+            connection.setAutoCommit(false);
+
+            Direccion direccion = t.getDireccion();
+
+            preparedStatementDirection.setInt(1, direccion.getBarrio().getId());
+            preparedStatementDirection.setString(2, direccion.getCalle());
+            preparedStatementDirection.setString(3, direccion.getCarrera());
+            preparedStatementDirection.setString(4, direccion.getNumero());
+            preparedStatementDirection.setString(5, direccion.getSobre());
+
+            ResultSet resultSetDireccion = preparedStatementDirection.executeQuery();
+
+            int idDireccion = DatabaseUtil.getLastInsertId(resultSetDireccion);
+
+            preparedStatementPersona.setString(1, t.getPrimerNombre());
+            preparedStatementPersona.setString(2, t.getSegundoNombre());
+            preparedStatementPersona.setString(3, t.getPrimerApellido());
+            preparedStatementPersona.setString(4, t.getSegundoApellido());
+            preparedStatementPersona.setString(5, t.getCedula());
+            preparedStatementPersona.setString(6, t.getTelefono());
+            preparedStatementPersona.setInt(7, idDireccion);
+
+            preparedStatementPersona.executeUpdate();
+
+            connection.commit();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                
+            }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
         }
+
         return -1;
     }
 
@@ -227,8 +256,7 @@ public class JdbcDaoPersona implements PersonaDao {
     public void delete(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
-    
+
     @Override
     public boolean isCedulaInUse(String cedula) {
         String sql = "SELECT COUNT(*) FROM persona WHERE cedula = ?";
@@ -243,10 +271,9 @@ public class JdbcDaoPersona implements PersonaDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false; 
+        return false;
     }
 
-    
     public boolean isTelefonoInUse(String telefono) {
         String sql = "SELECT COUNT(*) FROM persona WHERE telefono = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -260,7 +287,7 @@ public class JdbcDaoPersona implements PersonaDao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false; 
+        return false;
     }
 
 }

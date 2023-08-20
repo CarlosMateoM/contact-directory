@@ -2,6 +2,8 @@ package com.software.elector.util;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -27,5 +29,15 @@ public class DatabaseUtil {
         } catch (SQLException ex) {
         }
         return connection;
+    }
+
+    public static int getLastInsertId(ResultSet generatedKeys) throws SQLException {
+        if (generatedKeys.next()) {
+            int generatedId = generatedKeys.getInt(1);
+            return generatedId;
+        } else {
+            throw new SQLException("Error al obtener el id de la entidad insertada");
+        }
+
     }
 }

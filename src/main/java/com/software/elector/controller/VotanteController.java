@@ -68,8 +68,6 @@ public class VotanteController {
 
     public String guardarVotante(Persona persona) {
         try {
-            int id = direccionService.save(persona.getDireccion());
-            persona.getDireccion().setId(id);
             if(!persona.isValid() || !persona.getDireccion().isValid()){
                 throw new ValidationException(ValidationMessage.CAMPOS_OBLIGATORIOS.getMessage());
             }
