@@ -1,6 +1,7 @@
 application.properties
 software-elector-db.sqlite
 
+target/
 
 *.lst
 *.class
