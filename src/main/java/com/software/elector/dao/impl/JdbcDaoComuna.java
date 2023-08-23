@@ -67,7 +67,7 @@ public class JdbcDaoComuna implements ComunaDao {
 
     @Override
     public List<Comuna> getByKey(String key) {
-        String sql = "SELECT * FROM comuna WHERE comuna.nombre LIKE ?";
+        String sql = "SELECT * FROM comuna WHERE comuna.nombre ILIKE ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -153,7 +153,7 @@ public class JdbcDaoComuna implements ComunaDao {
 
     @Override
     public List<Comuna> getComunasByCiudad(Ciudad ciudad, String key) {
-        String sql = "SELECT * FROM  comuna c WHERE  c.ciudad_id = ? AND c.nombre LIKE ?";
+        String sql = "SELECT * FROM  comuna c WHERE  c.ciudad_id = ? AND c.nombre ILIKE ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, ciudad.getId());
             preparedStatement.setString(2, "%" + key + "%");

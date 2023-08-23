@@ -13,8 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 /**
  *
@@ -111,7 +110,7 @@ public class JdbcDaoPersona implements PersonaDao {
     }
 
     @Override
-    public List<Persona> getByKey(String key) {
+    public List<Persona> getByKey(String key){
         String sql = "SELECT "
                 + "p.primer_nombre as primerNombre, "
                 + "p.segundo_nombre as segundoNombre, "
@@ -126,14 +125,14 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "b.nombre as Barrio, "
                 + "c.nombre as comuna, "
                 + "c2.nombre as ciudad, "
-                + "p.primer_nombre || \" \" || p.segundo_nombre || \" \" || p.primer_apellido || \" \" || p.segundo_apellido  as nombreCompleto "
+                + "CONCAT(p.primer_nombre, ' ', p.segundo_nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido) AS nombreCompleto "
                 + "FROM "
                 + "persona p "
                 + "INNER JOIN direccion d ON p.direccion_id = d.id "
                 + "INNER JOIN barrio b ON d.barrio_id = b.id "
                 + "INNER JOIN comuna c ON b.comuna_id = c.id "
                 + "INNER JOIN ciudad c2 ON c.ciudad_id = c2.id "
-                + "WHERE nombreCompleto LIKE ? "
+                + "WHERE CONCAT(p.primer_nombre, ' ', p.segundo_nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido) ILIKE ? "
                 + "OR cedula LIKE ? ORDER BY p.primer_nombre";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {

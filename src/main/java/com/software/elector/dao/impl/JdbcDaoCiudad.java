@@ -64,7 +64,7 @@ public class JdbcDaoCiudad implements CiudadDao {
 
     @Override
     public List<Ciudad> getByKey(String key) {
-        String sql = "SELECT * FROM ciudad c WHERE c.nombre LIKE ? ORDER BY c.nombre";
+        String sql = "SELECT * FROM ciudad c WHERE c.nombre ILIKE ? ORDER BY c.nombre";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

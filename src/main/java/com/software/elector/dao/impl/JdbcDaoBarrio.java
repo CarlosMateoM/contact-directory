@@ -100,7 +100,7 @@ public class JdbcDaoBarrio implements BarrioDao {
 
     @Override
     public List<Barrio> getBarriosByComuna(Comuna comuna, String key) {
-        String sql = "SELECT * FROM  barrio b WHERE  b.comuna_id = ? AND b.nombre LIKE ? ORDER BY b.nombre";
+        String sql = "SELECT * FROM  barrio b WHERE  b.comuna_id = ? AND b.nombre ILIKE ? ORDER BY b.nombre";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, comuna.getId());
             preparedStatement.setString(2, "%" + key + "%");
