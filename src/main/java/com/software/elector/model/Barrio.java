@@ -10,6 +10,9 @@ public class Barrio {
     private Comuna comuna;
 
     public Barrio() {
+        id = -1;
+        nombre = "";
+        comuna = null;
     }
 
     public Barrio(int id, String nombre, Comuna comuna) {

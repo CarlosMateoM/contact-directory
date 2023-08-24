@@ -73,7 +73,8 @@ public class Direccion {
     }
     
     public boolean isValid() {
-        return !calle.isEmpty() &&
+        return barrio != null &&
+               !calle.isEmpty() &&
                !carrera.isEmpty() &&
                !numero.isEmpty() &&
                !sobre.isEmpty();
