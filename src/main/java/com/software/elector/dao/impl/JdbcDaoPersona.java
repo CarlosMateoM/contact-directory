@@ -53,7 +53,8 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "INNER JOIN direccion d ON p.direccion_id = d.id "
                 + "INNER JOIN barrio b ON d.barrio_id = b.id "
                 + "INNER JOIN comuna c ON b.comuna_id = c.id "
-                + "INNER JOIN ciudad c2 ON c.ciudad_id = c2.id";
+                + "INNER JOIN ciudad c2 ON c.ciudad_id = c2.id "
+                + "ORDER BY p.primer_nombre";
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
