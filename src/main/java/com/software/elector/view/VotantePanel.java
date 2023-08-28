@@ -1,6 +1,7 @@
 package com.software.elector.view;
 
 import com.software.elector.controller.VotanteController;
+import com.software.elector.enums.ValidationMessage;
 import com.software.elector.model.Persona;
 import com.software.elector.view.form.VotanteForm;
 import java.util.List;
@@ -147,11 +148,17 @@ public class VotantePanel extends javax.swing.JPanel {
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
         // TODO add your handling code here:
+        String mensaje;
         String key = buscarTxt.getText();
+        
         if(!key.isEmpty()){
-            votanteController.buscarPorClave(key);
+            mensaje = votanteController.buscarPorClave(key);
         } else {
-            votanteController.cargarVotantes();
+           mensaje = votanteController.cargarVotantes();
+        }
+        
+        if(!mensaje.equals( ValidationMessage.OPERACION_EXITOSA.getMessage())){
+            javax.swing.JOptionPane.showMessageDialog(null, mensaje);
         }
     }//GEN-LAST:event_buscarTxtKeyReleased
 

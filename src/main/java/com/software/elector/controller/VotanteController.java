@@ -1,6 +1,8 @@
 package com.software.elector.controller;
 
 import com.software.elector.enums.ValidationMessage;
+import com.software.elector.exception.DatabaseAccessException;
+import com.software.elector.exception.ServiceException;
 import com.software.elector.exception.ValidationException;
 import com.software.elector.model.Barrio;
 import com.software.elector.model.Ciudad;
@@ -52,13 +54,18 @@ public class VotanteController {
         form.cargarCiudades(ciudadService.getAll());
     }
 
-    public void cargarVotantes() {
-        view.cargarVontantes(personaService.getAll());
-    }
-
     public void onCiudadSelected(Ciudad ciudad) {
         List<Comuna> comunas = comunaService.getComunasByCiudad(ciudad.getId());
         form.cargarComunas(comunas);
+    }
+
+    public String cargarVotantes() {
+        try {
+            view.cargarVontantes(personaService.getAll());
+        } catch (DatabaseAccessException e) {
+            return e.getMessage();
+        }
+        return ValidationMessage.OPERACION_EXITOSA.getMessage();
     }
 
     public void onComunaSelected(Comuna comuna) {
@@ -68,18 +75,23 @@ public class VotanteController {
 
     public String guardarVotante(Persona persona) {
         try {
-            if(!persona.isValid() || !persona.getDireccion().isValid()){
+            if (!persona.isValid() || !persona.getDireccion().isValid()) {
                 throw new ValidationException(ValidationMessage.CAMPOS_OBLIGATORIOS.getMessage());
             }
             personaService.save(persona);
             view.cargarVontantes(personaService.getAll());
-        } catch (ValidationException e) {
+        } catch (DatabaseAccessException | ValidationException e) {
             return e.getMessage();
         }
         return ValidationMessage.VOTANTE_GUARDADO.getMessage();
     }
 
-    public void buscarPorClave(String key) {
-        view.cargarVontantes(personaService.getByKey(key));
+    public String buscarPorClave(String key) {
+        try {
+            view.cargarVontantes(personaService.getByKey(key));
+        } catch (ServiceException e) {
+            return e.getMessage();
+        }
+        return ValidationMessage.OPERACION_EXITOSA.getMessage();
     }
 }

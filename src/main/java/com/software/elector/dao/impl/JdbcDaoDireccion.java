@@ -7,19 +7,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  *
  * @author C.Mateo
  */
-public class JdbcDaoDireccion implements DireccionDao{
-    
-    private final Connection connection;
+public class JdbcDaoDireccion implements DireccionDao {
 
-    public JdbcDaoDireccion(Connection connection) {
-        this.connection = connection;
+    private final DataSource dataSource;
+
+    public JdbcDaoDireccion(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
-
+    
     @Override
     public Direccion getById(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -39,7 +40,9 @@ public class JdbcDaoDireccion implements DireccionDao{
     public int save(Direccion t) {
         String sql = "INSERT INTO direccion (barrio_id, calle, carrera, numero, sobre) VALUES (?, ?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, t.getBarrio().getId());
             preparedStatement.setString(2, t.getCalle());
             preparedStatement.setString(3, t.getCarrera());
@@ -53,7 +56,7 @@ public class JdbcDaoDireccion implements DireccionDao{
                     int generatedId = generatedKeys.getInt(1);  // Obtener el ID generado
                     return generatedId;
                 } else {
-                     throw new SQLException("Error al obtener el id de la entidad insertada [direccion]: " + t.toString());
+                    throw new SQLException("Error al obtener el id de la entidad insertada [direccion]: " + t.toString());
                 }
             }
 
@@ -72,5 +75,5 @@ public class JdbcDaoDireccion implements DireccionDao{
     public void delete(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
+
 }

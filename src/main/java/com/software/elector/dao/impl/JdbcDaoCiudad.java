@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import com.software.elector.dao.CiudadDao;
+import javax.sql.DataSource;
 
 /**
  *
@@ -15,16 +16,18 @@ import com.software.elector.dao.CiudadDao;
  */
 public class JdbcDaoCiudad implements CiudadDao {
 
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcDaoCiudad(Connection connection) {
-        this.connection = connection;
+    public JdbcDaoCiudad(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public Ciudad getById(Integer id) {
         String sql = "SELECT * FROM ciudad WHERE ciudad.id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -44,7 +47,9 @@ public class JdbcDaoCiudad implements CiudadDao {
     @Override
     public List<Ciudad> getAll() {
         String sql = "SELECT * FROM ciudad c ORDER BY c.nombre";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Ciudad> ciudades = new ArrayList<>();
@@ -65,7 +70,9 @@ public class JdbcDaoCiudad implements CiudadDao {
     @Override
     public List<Ciudad> getByKey(String key) {
         String sql = "SELECT * FROM ciudad c WHERE c.nombre ILIKE ? ORDER BY c.nombre";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Ciudad> ciudades = new ArrayList<>();
@@ -87,7 +94,9 @@ public class JdbcDaoCiudad implements CiudadDao {
     @Override
     public int save(Ciudad t) {
         String sql = "INSERT INTO ciudad (nombre) VALUES (?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, t.getNombre());
             preparedStatement.execute();
 
@@ -107,7 +116,9 @@ public class JdbcDaoCiudad implements CiudadDao {
     @Override
     public void update(Ciudad t) {
         String sql = "UPDATE ciudad SET nombre = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, t.getNombre());
             preparedStatement.setInt(2, t.getId());
 
@@ -121,7 +132,9 @@ public class JdbcDaoCiudad implements CiudadDao {
     @Override
     public void delete(Integer id) {
         String sql = "DELETE FROM ciudad WHERE ciudad.id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
 

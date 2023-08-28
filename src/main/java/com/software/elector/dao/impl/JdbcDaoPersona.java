@@ -1,6 +1,7 @@
 package com.software.elector.dao.impl;
 
 import com.software.elector.dao.PersonaDao;
+import com.software.elector.exception.DatabaseAccessException;
 import com.software.elector.model.Barrio;
 import com.software.elector.model.Ciudad;
 import com.software.elector.model.Comuna;
@@ -13,7 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.sql.DataSource;
 
 /**
  *
@@ -21,10 +22,10 @@ import java.util.List;
  */
 public class JdbcDaoPersona implements PersonaDao {
 
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcDaoPersona(Connection connection) {
-        this.connection = connection;
+    public JdbcDaoPersona(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -55,7 +56,8 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "INNER JOIN comuna c ON b.comuna_id = c.id "
                 + "INNER JOIN ciudad c2 ON c.ciudad_id = c2.id";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Persona> personas = new ArrayList<>();
@@ -104,13 +106,12 @@ public class JdbcDaoPersona implements PersonaDao {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseAccessException("Error al intentar obtener los registros de votante: " + e.getMessage(), e);
         }
-        return null;
     }
 
     @Override
-    public List<Persona> getByKey(String key){
+    public List<Persona> getByKey(String key) {
         String sql = "SELECT "
                 + "p.primer_nombre as primerNombre, "
                 + "p.segundo_nombre as segundoNombre, "
@@ -135,7 +136,12 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "WHERE CONCAT(p.primer_nombre, ' ', p.segundo_nombre, ' ', p.primer_apellido, ' ', p.segundo_apellido) ILIKE ? "
                 + "OR cedula LIKE ? ORDER BY p.primer_nombre";
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection(); 
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            
+                ) {
+            
             preparedStatement.setString(1, "%" + key + "%");
             preparedStatement.setString(2, "%" + key + "%");
 
@@ -186,9 +192,8 @@ public class JdbcDaoPersona implements PersonaDao {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseAccessException("Error al intentar obtener los registros de votante: " + e.getMessage(), e);
         }
-        return null;
     }
 
     @Override
@@ -197,8 +202,8 @@ public class JdbcDaoPersona implements PersonaDao {
         String direccionSql = "INSERT INTO direccion (barrio_id, calle, carrera, numero, sobre) VALUES (?, ?, ?, ?, ?) RETURNING id";
         String personaSql = "INSERT INTO persona (primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, cedula, telefono, direccion_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try (PreparedStatement preparedStatementPersona = connection.prepareStatement(personaSql); 
-                PreparedStatement preparedStatementDirection = connection.prepareStatement(direccionSql)) {
+        try (
+                Connection connection = dataSource.getConnection(); PreparedStatement preparedStatementPersona = connection.prepareStatement(personaSql); PreparedStatement preparedStatementDirection = connection.prepareStatement(direccionSql)) {
 
             connection.setAutoCommit(false);
 
@@ -227,20 +232,7 @@ public class JdbcDaoPersona implements PersonaDao {
             connection.commit();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                
-            }
-        } finally {
-            try {
-                connection.setAutoCommit(true);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-
+            throw new DatabaseAccessException("Error al intentar guardar el nuevo votante: " + e.getMessage(), e);
         }
 
         return -1;
@@ -259,7 +251,8 @@ public class JdbcDaoPersona implements PersonaDao {
     @Override
     public boolean isCedulaInUse(String cedula) {
         String sql = "SELECT COUNT(*) FROM persona WHERE cedula = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, cedula);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -275,7 +268,7 @@ public class JdbcDaoPersona implements PersonaDao {
 
     public boolean isTelefonoInUse(String telefono) {
         String sql = "SELECT COUNT(*) FROM persona WHERE telefono = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, telefono);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
