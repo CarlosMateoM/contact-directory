@@ -34,7 +34,8 @@ public class PersonaService implements GenericService<Persona, Integer> {
         try {
             return personaDao.getByKey(key);
         } catch (Exception e) {
-            throw new ServiceException("Error al obtener los registro en el servicio personas: " + e.getMessage(), e);
+            throw new ServiceException("Error al acceder al servicio de persona.\n" + e.getMessage(), e);
+            
         }
     }
 

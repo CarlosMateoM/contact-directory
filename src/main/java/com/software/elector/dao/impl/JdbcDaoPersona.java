@@ -1,6 +1,7 @@
 package com.software.elector.dao.impl;
 
 import com.software.elector.dao.PersonaDao;
+import com.software.elector.enums.ProcessErrorMessage;
 import com.software.elector.exception.DatabaseAccessException;
 import com.software.elector.model.Barrio;
 import com.software.elector.model.Ciudad;
@@ -30,7 +31,7 @@ public class JdbcDaoPersona implements PersonaDao {
 
     @Override
     public Persona getById(Integer id) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -138,11 +139,11 @@ public class JdbcDaoPersona implements PersonaDao {
                 + "OR cedula LIKE ? ORDER BY p.primer_nombre";
 
         try (
-                Connection connection = dataSource.getConnection(); 
+                Connection connection = dataSource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            
+                
                 ) {
-            
+
             preparedStatement.setString(1, "%" + key + "%");
             preparedStatement.setString(2, "%" + key + "%");
 
@@ -193,7 +194,12 @@ public class JdbcDaoPersona implements PersonaDao {
             }
 
         } catch (SQLException e) {
-            throw new DatabaseAccessException("Error al intentar obtener los registros de votante: " + e.getMessage(), e);
+            throw new DatabaseAccessException(
+                    String.format(
+                            ProcessErrorMessage.ERROR_REGISTROS_FILTRADOS.getMessage(),
+                             key
+                    ) + e.getMessage(),
+                    e);
         }
     }
 
