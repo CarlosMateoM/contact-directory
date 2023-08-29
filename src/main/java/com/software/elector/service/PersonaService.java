@@ -2,6 +2,7 @@ package com.software.elector.service;
 
 import com.software.elector.dao.PersonaDao;
 import com.software.elector.enums.ValidationMessage;
+import com.software.elector.exception.ServiceException;
 import com.software.elector.exception.ValidationException;
 import com.software.elector.model.Persona;
 import java.util.List;
@@ -30,19 +31,23 @@ public class PersonaService implements GenericService<Persona, Integer> {
 
     @Override
     public List<Persona> getByKey(String key) {
-        return personaDao.getByKey(key);
+        try {
+            return personaDao.getByKey(key);
+        } catch (Exception e) {
+            throw new ServiceException("Error al obtener los registro en el servicio personas: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public int save(Persona t) {
-        
+
         if (personaDao.isCedulaInUse(t.getCedula())) {
             throw new ValidationException(ValidationMessage.CEDULA_EN_USO.getMessage());
         }
         if (personaDao.isTelefonoInUse(t.getTelefono())) {
             throw new ValidationException(ValidationMessage.TELEFONO_EN_USO.getMessage());
         }
-        
+
         return personaDao.save(t);
     }
 

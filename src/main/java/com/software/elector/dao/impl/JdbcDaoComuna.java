@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  *
@@ -16,16 +17,20 @@ import java.util.List;
  */
 public class JdbcDaoComuna implements ComunaDao {
 
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcDaoComuna(Connection connection) {
-        this.connection = connection;
+    public JdbcDaoComuna(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
+    
+    
 
     @Override
     public Comuna getById(Integer id) {
         String sql = "SELECT * FROM comuna WHERE comuna.id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -46,7 +51,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public List<Comuna> getAll() {
         String sql = "SELECT * FROM comuna";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Comuna> comunas = new ArrayList<>();
                 while (resultSet.next()) {
@@ -68,7 +75,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public List<Comuna> getByKey(String key) {
         String sql = "SELECT * FROM comuna WHERE comuna.nombre ILIKE ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Comuna> comunas = new ArrayList<>();
@@ -91,7 +100,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public int save(Comuna t) {
         String sql = "INSERT INTO comuna (nombre, ciudad_id) VALUES (?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, t.getNombre());
             preparedStatement.setInt(2, t.getCiudad().getId());
             preparedStatement.execute();
@@ -105,7 +116,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public void update(Comuna t) {
         String sql = "UPDATE comuna SET nombre = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, t.getNombre());
             preparedStatement.setInt(2, t.getId());
 
@@ -119,7 +132,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public void delete(Integer id) {
         String sql = "DELETE FROM comuna WHERE ciudad.id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
 
@@ -131,7 +146,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public List<Comuna> getComunasByCiudad(int id) {
         String sql = "SELECT * FROM  comuna c WHERE  c.ciudad_id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Comuna> comunas = new ArrayList<>();
@@ -154,7 +171,9 @@ public class JdbcDaoComuna implements ComunaDao {
     @Override
     public List<Comuna> getComunasByCiudad(Ciudad ciudad, String key) {
         String sql = "SELECT * FROM  comuna c WHERE  c.ciudad_id = ? AND c.nombre ILIKE ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, ciudad.getId());
             preparedStatement.setString(2, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

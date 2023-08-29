@@ -26,23 +26,23 @@ public class AppConfig {
     //Métodos para crear la instancia de los DAO's
     
     public static CiudadDao createCiudadDao(){
-        return new JdbcDaoCiudad(DatabaseUtil.getConnection());
+        return new JdbcDaoCiudad(DatabaseUtil.getDataSource());
     }
    
     public static BarrioDao createBarrioDao(){
-        return new JdbcDaoBarrio(DatabaseUtil.getConnection());
+        return new JdbcDaoBarrio(DatabaseUtil.getDataSource());
     }
     
     public static DireccionDao createDireccionDao(){
-        return new JdbcDaoDireccion(DatabaseUtil.getConnection());
+        return new JdbcDaoDireccion(DatabaseUtil.getDataSource());
     }
     
     public static ComunaDao createComunaDao(){
-        return new JdbcDaoComuna(DatabaseUtil.getConnection());
+        return new JdbcDaoComuna(DatabaseUtil.getDataSource());
     }
     
     public static PersonaDao createPersonaDao(){
-        return new JdbcDaoPersona(DatabaseUtil.getConnection());
+        return new JdbcDaoPersona(DatabaseUtil.getDataSource());
     }
     
     // Métodos para crear la instancia de los servicios

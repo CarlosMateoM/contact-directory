@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
 
 /**
  *
@@ -16,12 +17,12 @@ import java.util.List;
  */
 public class JdbcDaoBarrio implements BarrioDao {
 
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcDaoBarrio(Connection connection) {
-        this.connection = connection;
+    public JdbcDaoBarrio(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
-
+    
     @Override
     public Barrio getById(Integer id) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -40,7 +41,9 @@ public class JdbcDaoBarrio implements BarrioDao {
     @Override
     public int save(Barrio t) {
         String sql = "INSERT INTO barrio (nombre, comuna_id) VALUES (?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, t.getNombre());
             preparedStatement.setInt(2, t.getComuna().getId());
             preparedStatement.execute();
@@ -65,8 +68,10 @@ public class JdbcDaoBarrio implements BarrioDao {
 
     @Override
     public void delete(Integer id) {
-         String sql = "DELETE FROM barrio WHERE barrio.id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM barrio WHERE barrio.id = ?";
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             preparedStatement.execute();
 
@@ -78,7 +83,9 @@ public class JdbcDaoBarrio implements BarrioDao {
     @Override
     public List<Barrio> getBarriosByComuna(int id) {
         String sql = "SELECT * FROM  barrio c WHERE  c.comuna_id = ? ORDER BY c.nombre";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 List<Barrio> barrios = new ArrayList<>();
@@ -101,7 +108,9 @@ public class JdbcDaoBarrio implements BarrioDao {
     @Override
     public List<Barrio> getBarriosByComuna(Comuna comuna, String key) {
         String sql = "SELECT * FROM  barrio b WHERE  b.comuna_id = ? AND b.nombre ILIKE ? ORDER BY b.nombre";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (
+                Connection connection = dataSource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setInt(1, comuna.getId());
             preparedStatement.setString(2, "%" + key + "%");
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

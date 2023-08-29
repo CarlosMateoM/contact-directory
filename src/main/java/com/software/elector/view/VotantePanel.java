@@ -1,10 +1,12 @@
 package com.software.elector.view;
 
 import com.software.elector.controller.VotanteController;
+import com.software.elector.enums.ValidationMessage;
 import com.software.elector.model.Persona;
 import com.software.elector.view.form.VotanteForm;
+import com.software.elector.view.model.PersonaTableModel;
 import java.util.List;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -14,55 +16,33 @@ public class VotantePanel extends javax.swing.JPanel {
 
     private VotanteForm votanteForm;
     private VotanteController votanteController;
-    private final DefaultTableModel tablaVotantes;
-    
+    private PersonaTableModel tablaVotantes;
 
     /**
      * Creates new form VotantePanel
      */
     public VotantePanel() {
         initComponents();
-        tablaVotantes = (DefaultTableModel) jTableVotantes.getModel();
+        init();
     }
     
+    private void init(){
+        tablaVotantes = new PersonaTableModel();
+        jTableVotantes.setModel(tablaVotantes);
+    }
+
     public void setVotanteController(VotanteController votanteController) {
         this.votanteController = votanteController;
     }
-    
-    
-    public void setVotanteForm(VotanteForm votanteForm){
+
+    public void setVotanteForm(VotanteForm votanteForm) {
         this.votanteForm = votanteForm;
     }
 
     public void cargarVontantes(List<Persona> personas) {
-        tablaVotantes.setRowCount(0);
-        for (Persona persona : personas) {
-            tablaVotantes.addRow(new String[]{
-                String.format(
-                "%s %s",
-                persona.getPrimerNombre(),
-                persona.getSegundoNombre()
-                ),
-                String.format(
-                "%s %s",
-                persona.getPrimerApellido(),
-                persona.getSegundoApellido()
-                ),
-                persona.getCedula(),
-                persona.getTelefono(),
-                String.format(
-                        "Calle %s Carrera %s Nro %s Sobre %s", 
-                        persona.getDireccion().getCalle(),
-                        persona.getDireccion().getCarrera(),
-                        persona.getDireccion().getNumero(),
-                        persona.getDireccion().getSobre()
-                ),
-                persona.getDireccion().getBarrio().getNombre(),
-                persona.getDireccion().getBarrio().getComuna().getNombre(),
-                persona.getDireccion().getBarrio().getComuna().getCiudad().getNombre()
-                }
-            );
-        }
+        SwingUtilities.invokeLater(() -> {
+            tablaVotantes.setListaPersonas(personas);
+        });
     }
 
     /**
@@ -147,12 +127,30 @@ public class VotantePanel extends javax.swing.JPanel {
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
         // TODO add your handling code here:
-        String key = buscarTxt.getText();
-        if(!key.isEmpty()){
-            votanteController.buscarPorClave(key);
-        } else {
-            votanteController.cargarVotantes();
-        }
+
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+
+                String mensaje;
+                String key = buscarTxt.getText();
+
+                if (!key.isEmpty()) {
+                    mensaje = votanteController.buscarPorClave(key);
+                } else {
+                    mensaje = votanteController.cargarVotantes();
+                }
+
+                if (!mensaje.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
+                    javax.swing.JOptionPane.showMessageDialog(null, mensaje);
+                }
+            }
+
+        };
+
+        thread.start();
+
     }//GEN-LAST:event_buscarTxtKeyReleased
 
 
