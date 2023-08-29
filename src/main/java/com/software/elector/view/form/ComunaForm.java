@@ -49,6 +49,10 @@ public class ComunaForm extends javax.swing.JPanel {
         });
     }
 
+    public BarrioForm getBarrioForm() {
+        return barrioForm;
+    }
+    
     public void setCiudad(Ciudad ciudad) {
         this.ciudad = ciudad;
         ciudadNameLb.setText(ciudad.getNombre());

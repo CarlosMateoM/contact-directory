@@ -5,6 +5,7 @@ import com.software.elector.enums.ValidationMessage;
 import com.software.elector.model.Barrio;
 import com.software.elector.model.Comuna;
 import com.software.elector.view.model.BarrioTableModel;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.SwingUtilities;
 
@@ -33,8 +34,12 @@ public class BarrioForm extends javax.swing.JPanel {
 
     public void setComuna(Comuna comuna) {
         this.comuna = comuna;
-        ComunaNameLb.setText(comuna.getNombre());
+        setComunaNameLb(comuna.getNombre());
         barrioController.getBarriosByComuna(comuna);
+    }
+    
+    public void setComunaNameLb(String name){
+        ComunaNameLb.setText(name);
     }
 
     public void setBarrioController(BarrioController barrioController) {
@@ -46,7 +51,7 @@ public class BarrioForm extends javax.swing.JPanel {
             tablaBarrios.setListaBarrios(barrios);
         });
     }
-
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -117,9 +122,7 @@ public class BarrioForm extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton4))
+                            .addComponent(jButton4)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(buscarTxt)
                                 .addGap(0, 0, 0)
@@ -146,9 +149,9 @@ public class BarrioForm extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(ComunaNameLb, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(8, 8, 8)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(8, 8, 8)
                 .addComponent(jButton4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)

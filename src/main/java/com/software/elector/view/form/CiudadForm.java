@@ -4,7 +4,9 @@ import com.software.elector.controller.CiudadController;
 import com.software.elector.enums.ValidationMessage;
 import com.software.elector.exception.ValidationException;
 import com.software.elector.model.Ciudad;
+import com.software.elector.model.Comuna;
 import com.software.elector.view.model.CiudadTableModel;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
@@ -39,6 +41,8 @@ public class CiudadForm extends javax.swing.JPanel {
                 if (selectedRow >= 0) {
                     try {
                         Ciudad ciudad = tablaCiudad.getListaCiudades().get(selectedRow);
+                        comunaForm.getBarrioForm().setComunaNameLb("");
+                        comunaForm.getBarrioForm().cargarBarrios(new ArrayList<>());
                         comunaForm.setCiudad(ciudad);
                     } catch (ValidationException ex) {
                         javax.swing.JOptionPane.showMessageDialog(null, ex.getMessage());
