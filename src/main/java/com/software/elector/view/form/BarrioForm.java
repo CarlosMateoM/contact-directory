@@ -6,6 +6,7 @@ import com.software.elector.model.Barrio;
 import com.software.elector.model.Comuna;
 import com.software.elector.view.model.BarrioTableModel;
 import java.util.List;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class BarrioForm extends javax.swing.JPanel {
 
-    private Comuna comuna;   
+    private Comuna comuna;
     private BarrioTableModel tablaBarrios;
     private BarrioController barrioController;
 
@@ -41,9 +42,11 @@ public class BarrioForm extends javax.swing.JPanel {
     }
 
     public void cargarBarrios(List<Barrio> barrios) {
-        tablaBarrios.setListaBarrios(barrios);
+        SwingUtilities.invokeLater(() -> {
+            tablaBarrios.setListaBarrios(barrios);
+        });
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -160,33 +163,41 @@ public class BarrioForm extends javax.swing.JPanel {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-      
+
         String nombre = nombreTxt.getText();
         Barrio barrio = new Barrio(-1, nombre, comuna);
         String response = barrioController.guardarBarrio(barrio);
-        
-        if(response.equals(ValidationMessage.BARRIO_GUARDADO.getMessage())){
+        if (response.equals(ValidationMessage.BARRIO_GUARDADO.getMessage())) {
             nombreTxt.setText("");
         }
-        
         javax.swing.JOptionPane.showMessageDialog(null, response);
-         
+
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
         // TODO add your handling code here:
-        String response;
-        String key = buscarTxt.getText();
-        
-        if(!key.isEmpty()){
-            response = barrioController.getBarriosByComuna(comuna, key);
-        } else {
-            response = barrioController.getBarriosByComuna(comuna);
-        }
-        
-         if(!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())){
-            javax.swing.JOptionPane.showMessageDialog(null, response);
-        }
+
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                String response;
+                String key = buscarTxt.getText();
+
+                if (!key.isEmpty()) {
+                    response = barrioController.getBarriosByComuna(comuna, key);
+                } else {
+                    response = barrioController.getBarriosByComuna(comuna);
+                }
+
+                if (!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
+                    javax.swing.JOptionPane.showMessageDialog(null, response);
+                }
+
+            }
+        };
+
+        thread.start();
     }//GEN-LAST:event_buscarTxtKeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

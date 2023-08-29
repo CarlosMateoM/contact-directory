@@ -191,18 +191,30 @@ public class ComunaForm extends javax.swing.JPanel {
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
         // TODO add your handling code here:
-        String response;
-        String key = buscarTxt.getText();
+
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+
+                String response;
+                String key = buscarTxt.getText();
+
+                if (!key.isEmpty()) {
+                    response = comunaController.getComunaByCiudad(ciudad, key);
+                } else {
+                    response = comunaController.getComunasByCiudad(ciudad);
+                }
+
+                if (!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
+                    javax.swing.JOptionPane.showMessageDialog(null, response);
+                }
+            }
+
+        };
         
-        if (!key.isEmpty()) {
-            response = comunaController.getComunaByCiudad(ciudad, key);
-        } else {
-            response = comunaController.getComunasByCiudad(ciudad);
-        }
-        
-        if(!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())){
-            javax.swing.JOptionPane.showMessageDialog(null, response);
-        }
+        thread.start();
+
     }//GEN-LAST:event_buscarTxtKeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed

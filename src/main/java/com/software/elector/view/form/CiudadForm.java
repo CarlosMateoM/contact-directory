@@ -7,8 +7,8 @@ import com.software.elector.model.Ciudad;
 import com.software.elector.view.model.CiudadTableModel;
 import java.util.List;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
-
 
 /**
  *
@@ -51,15 +51,17 @@ public class CiudadForm extends javax.swing.JPanel {
     public void setComunaForm(ComunaForm comunaForm) {
         this.comunaForm = comunaForm;
     }
-    
+
     public void setCiudadController(CiudadController ciudadController) {
         this.ciudadController = ciudadController;
     }
 
     public void cargarCiudades(List<Ciudad> ciudades) {
-        tablaCiudad.setListaCiudades(ciudades);
+        SwingUtilities.invokeLater(() -> {
+            tablaCiudad.setListaCiudades(ciudades);
+        });
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -168,12 +170,19 @@ public class CiudadForm extends javax.swing.JPanel {
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
         // TODO add your handling code here:
-        String key = buscarTxt.getText();
-        if(!key.isEmpty()){
-            ciudadController.buscarCiudad(key);
-        } else {
-            ciudadController.cargarCiudades();
-        }
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                String key = buscarTxt.getText();
+                if (!key.isEmpty()) {
+                    ciudadController.buscarCiudad(key);
+                } else {
+                    ciudadController.cargarCiudades();
+                }
+            }
+        };
+        
+        thread.start();
     }//GEN-LAST:event_buscarTxtKeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
