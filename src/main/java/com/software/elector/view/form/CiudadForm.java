@@ -4,7 +4,6 @@ import com.software.elector.controller.CiudadController;
 import com.software.elector.enums.ValidationMessage;
 import com.software.elector.exception.ValidationException;
 import com.software.elector.model.Ciudad;
-import com.software.elector.model.Comuna;
 import com.software.elector.view.model.CiudadTableModel;
 import java.util.ArrayList;
 import java.util.List;

@@ -2,6 +2,7 @@ application.properties
 software-elector-db.sqlite
 
 target/
+fake-data/
 
 *.lst
 *.class
