@@ -32,6 +32,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <exec.mainClass>com.software.elector.SoftwareElector</exec.mainClass>
+        <exec.mainClass>contact.directory.ContactDirectory</exec.mainClass>
     </properties>
 </project>
