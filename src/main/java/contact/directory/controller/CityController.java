@@ -5,12 +5,14 @@ import contact.directory.exception.ValidationException;
 import contact.directory.model.City;
 import contact.directory.service.CityService;
 import contact.directory.view.form.CityForm;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
  * @author C.Mateo
  */
-public class CityController {
+public class CityController implements ActionListener, CitySelected{
 
     private final CityForm view;
     private final CityService cityService;
@@ -50,6 +52,16 @@ public class CityController {
     public String deleteCity(City city){
         cityService.delete(city.getId());
         return ValidationMessage.CIUDAD_ELIMINADA.getMessage();
+    }
+    
+    @Override
+    public void onCitySelected(City city) {
+        
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
     }
 
 }

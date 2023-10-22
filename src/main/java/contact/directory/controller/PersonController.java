@@ -4,59 +4,42 @@ import contact.directory.enums.ValidationMessage;
 import contact.directory.exception.DatabaseAccessException;
 import contact.directory.exception.ServiceException;
 import contact.directory.exception.ValidationException;
-import contact.directory.model.Neighborhood;
-import contact.directory.model.City;
-import contact.directory.model.Commune;
 import contact.directory.model.Person;
 import contact.directory.view.form.PersonForm;
-import contact.directory.service.NeighborhoodService;
-import contact.directory.service.CityService;
-import contact.directory.service.CommuneService;
-import contact.directory.service.AddressService;
 import contact.directory.service.PersonService;
 import contact.directory.view.PersonPanel;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
  * @author C.Mateo
  */
-public class PersonController {
+public class PersonController implements ActionListener {
 
     private final PersonForm form;
     private final PersonPanel view;
-    private final NeighborhoodService barrioService;
-    private final CommuneService comunaService;
-    private final CityService ciudadService;
-    private final PersonService personaService;
-    private final AddressService direccionService;
+    private final PersonService personService;
 
     public PersonController(
             PersonForm form,
             PersonPanel view,
-            NeighborhoodService barrioService,
-            CommuneService comunaService,
-            CityService ciudadService,
-            PersonService personaService,
-            AddressService direccionService
+            PersonService personaService
     ) {
         this.form = form;
         this.view = view;
-        this.barrioService = barrioService;
-        this.comunaService = comunaService;
-        this.ciudadService = ciudadService;
-        this.personaService = personaService;
-        this.direccionService = direccionService;
+        this.personService = personaService;
     }
 
     public void initView() {
+        
         loadPeopleAndUpdateView();
-        form.cargarCiudades(ciudadService.getAll());
+        //form.cargarCiudades(ciudadService.getAll());
     }
 
     public String loadPeopleAndUpdateView() {
         try {
-            view.cargarVontantes(personaService.getAll());
+            view.cargarVontantes(personService.getAll());
         } catch (DatabaseAccessException e) {
             return e.getMessage();
         }
@@ -68,7 +51,7 @@ public class PersonController {
             if (!person.isValid() || !person.getAddress().isValid()) {
                 throw new ValidationException(ValidationMessage.CAMPOS_OBLIGATORIOS.getMessage());
             }
-            personaService.save(person);
+            personService.save(person);
             loadPeopleAndUpdateView();
         } catch (DatabaseAccessException | ValidationException e) {
             return e.getMessage();
@@ -78,13 +61,14 @@ public class PersonController {
 
     public String searchPeople(String key) {
         try {
-            view.cargarVontantes(personaService.getByKey(key));
+            view.cargarVontantes(personService.getByKey(key));
         } catch (ServiceException e) {
             return e.getMessage();
         }
         return ValidationMessage.OPERACION_EXITOSA.getMessage();
     }
-    
+
+    /*
     public void onCommuneSelected(Commune commune) {
         List<Neighborhood> barrios = barrioService.getNeighborhoodByCommune(commune.getId());
         form.cargarBarrios(barrios);
@@ -94,4 +78,18 @@ public class PersonController {
         List<Commune> comunas = comunaService.getCommunesByCity(city.getId());
         form.cargarComunas(comunas);
     }
+     */
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        switch (command) {
+            case "save": if(true);
+                break;
+            case "unsaved" : if(true);
+                break;
+        }
+
+    }
 }
+    

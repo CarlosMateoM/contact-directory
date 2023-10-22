@@ -1,5 +1,6 @@
 package contact.directory.view.form;
 
+import contact.directory.controller.CitySelected;
 import contact.directory.controller.PersonController;
 import contact.directory.enums.ValidationMessage;
 import contact.directory.model.Neighborhood;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class PersonForm extends javax.swing.JPanel {
 
+    private CitySelected citySelected;
     private PersonController votanteController;
 
     /**
@@ -25,8 +27,9 @@ public class PersonForm extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void setVotanteController(PersonController votanteController) {
+    public void setController(PersonController votanteController) {
         this.votanteController = votanteController;
+    
         init();
     }
 
@@ -34,16 +37,17 @@ public class PersonForm extends javax.swing.JPanel {
         ciudadComboBox.getComboBox().addActionListener((ActionEvent e) -> {
             City ciudadSeleccionada = (City) ciudadComboBox.getComboBox().getSelectedItem();
             if (ciudadSeleccionada != null) {
-                votanteController.onCitySelected(ciudadSeleccionada);
+                citySelected.onCitySelected(ciudadSeleccionada);
             }
         });
-
+        /*
         comunaComboBox.getComboBox().addActionListener((ActionEvent e) -> {
             Commune comunaSeleccionada = (Commune) comunaComboBox.getComboBox().getSelectedItem();
             if (comunaSeleccionada != null) {
                 votanteController.onCommuneSelected(comunaSeleccionada);
             }
         });
+        */
     }
 
     public void cargarCiudades(List<City> ciudades) {
