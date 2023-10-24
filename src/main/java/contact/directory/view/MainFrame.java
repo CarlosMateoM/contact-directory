@@ -1,4 +1,3 @@
-
 package contact.directory.view;
 
 import contact.directory.view.form.AddressForm;
@@ -17,23 +16,23 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         init();
     }
-    
-    private void init(){
-        votantePanel.setVotanteForm(votanteForm);
+
+    private void init() {
+        personPanel.setPersonForm(personForm);
     }
 
     public PersonForm getPersonForm() {
-        return votanteForm;
+        return personForm;
     }
-    
-    public PersonPanel getVotantePanel(){
-        return votantePanel;
+
+    public PersonPanel getPersonPanel() {
+        return personPanel;
     }
 
     public AddressForm getUbicacionPanel() {
         return ubicacionPanel;
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -43,16 +42,16 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        votanteForm = new contact.directory.view.form.PersonForm();
+        personForm = new contact.directory.view.form.PersonForm();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        votantePanel = new contact.directory.view.PersonPanel();
+        personPanel = new contact.directory.view.PersonPanel();
         ubicacionPanel = new contact.directory.view.form.AddressForm();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Software Elector");
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
 
-        jTabbedPane1.addTab("VOTANTES", votantePanel);
+        jTabbedPane1.addTab("VOTANTES", personPanel);
         jTabbedPane1.addTab("UBICACION", ubicacionPanel);
 
         getContentPane().add(jTabbedPane1);
@@ -62,11 +61,10 @@ public class MainFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
+    private contact.directory.view.form.PersonForm personForm;
+    private contact.directory.view.PersonPanel personPanel;
     private contact.directory.view.form.AddressForm ubicacionPanel;
-    private contact.directory.view.form.PersonForm votanteForm;
-    private contact.directory.view.PersonPanel votantePanel;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,9 +1,9 @@
 package contact.directory.view.form;
 
 import contact.directory.controller.NeighborhoodController;
-import contact.directory.enums.ValidationMessage;
 import contact.directory.model.Neighborhood;
 import contact.directory.model.Commune;
+import contact.directory.view.interfaces.NeighborhoodView;
 import contact.directory.view.model.BarrioTableModel;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -14,7 +14,7 @@ import javax.swing.SwingUtilities;
  *
  * @author C.Mateo
  */
-public class NeighborhoodForm extends javax.swing.JPanel {
+public class NeighborhoodForm extends javax.swing.JPanel implements NeighborhoodView {
 
     private Commune comuna;
     private BarrioTableModel tablaBarrios;
@@ -31,6 +31,11 @@ public class NeighborhoodForm extends javax.swing.JPanel {
     private void init() {
         tablaBarrios = new BarrioTableModel();
         jTableBarrios.setModel(tablaBarrios);
+    }
+    
+    @Override
+    public String getSearchTxtNeigborhood() {
+        return buscarTxt.getText();
     }
 
     public void setActionListener(ActionListener actionListener){
@@ -53,7 +58,6 @@ public class NeighborhoodForm extends javax.swing.JPanel {
     public void setComuna(Commune comuna) {
         this.comuna = comuna;
         setComunaNameLb(comuna.getName());
-        barrioController.getNeighborhoodByCommune(comuna);
     }
 
     public void setComunaNameLb(String name) {
@@ -188,8 +192,6 @@ public class NeighborhoodForm extends javax.swing.JPanel {
 
     private void eliminarButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_eliminarButtonActionPerformed
         // TODO add your handling code here:
-
-
     }//GEN-LAST:event_eliminarButtonActionPerformed
 
     private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
@@ -203,19 +205,15 @@ public class NeighborhoodForm extends javax.swing.JPanel {
                 String key = buscarTxt.getText();
 
                 if (!key.isEmpty()) {
-                    response = barrioController.searchNeighborhoodByCommune(comuna, key);
+                    //response = barrioController.searchNeighborhoodByCommune(comuna, key);
                 } else {
-                    response = barrioController.getNeighborhoodByCommune(comuna);
+                    //response = barrioController.getNeighborhoodByCommune(comuna);
                 }
 
-                if (!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
-                    javax.swing.JOptionPane.showMessageDialog(null, response);
-                }
 
             }
         };
 
-        thread.start();
     }//GEN-LAST:event_buscarTxtKeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
@@ -238,5 +236,17 @@ public class NeighborhoodForm extends javax.swing.JPanel {
     private javax.swing.JTable jTableBarrios;
     private javax.swing.JTextField nombreTxt;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void loadNeighborhoodByCommune(List<Neighborhood> neighborhoods) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Neighborhood getNeighborhoodData() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    
 
 }

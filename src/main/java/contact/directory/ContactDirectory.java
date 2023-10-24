@@ -6,11 +6,11 @@ import contact.directory.controller.NeighborhoodController;
 import contact.directory.controller.CityController;
 import contact.directory.controller.CommuneController;
 import contact.directory.controller.PersonController;
+import contact.directory.controller.SearchPersonController;
 import contact.directory.exception.DatabaseAccessException;
 import contact.directory.service.NeighborhoodService;
 import contact.directory.service.CityService;
 import contact.directory.service.CommuneService;
-import contact.directory.service.AddressService;
 import contact.directory.service.PersonService;
 import contact.directory.view.MainFrame;
 
@@ -25,50 +25,35 @@ public class ContactDirectory {
         try {
 
             FlatLightLaf.setup();
+            
             MainFrame mainFrame = new MainFrame();
 
-            NeighborhoodService barrioService = AppConfig.createBarrioService();
-            CommuneService comunaService = AppConfig.createComunaService();
-            CityService ciudadService = AppConfig.createCiudadService();
-            PersonService personaService = AppConfig.createPersonaService();
-            AddressService direccionService = AppConfig.createDireccionService();
-
-            CommuneController comunaController = new CommuneController(
-                    mainFrame.getUbicacionPanel().getComunaForm(),
-                    comunaService
-            );
-
-            CityController ciudadController = new CityController(
-                    mainFrame.getUbicacionPanel().getCiudadForm(),
-                    ciudadService
-            );
-
-            NeighborhoodController barrioController = new NeighborhoodController(
-                    mainFrame.getUbicacionPanel().getBarrioForm(),
-                    barrioService
-            );
+            NeighborhoodService neighborhoodService = AppConfig.createBarrioService();
+            CommuneService communeService = AppConfig.createComunaService();
+            CityService cityService = AppConfig.createCiudadService();
+            PersonService personService = AppConfig.createPersonaService();
             
-            barrioController.init();
-
-            PersonController votanteController = new PersonController(
-                    mainFrame.getPersonForm(),
-                    mainFrame.getVotantePanel(),
-                    barrioService,
-                    comunaService,
-                    ciudadService,
-                    personaService,
-                    direccionService
-            );
-
-            mainFrame.getPersonForm().setVotanteController(votanteController);
-            mainFrame.getVotantePanel().setVotanteController(votanteController);
-
-            mainFrame.getUbicacionPanel().getCiudadForm().setCiudadController(ciudadController);
-            mainFrame.getUbicacionPanel().getComunaForm().setComunacontroller(comunaController);
-            mainFrame.getUbicacionPanel().getBarrioForm().setBarrioController(barrioController);
+            CityController cityController = new CityController(cityService);
+            CommuneController communeController = new CommuneController(communeService);
+            PersonController personController = new PersonController(personService);
+            SearchPersonController searchPersonController = new SearchPersonController(personService);
+            NeighborhoodController neighborhoodController = new NeighborhoodController(neighborhoodService);
             
-            votanteController.initView();
-            ciudadController.initView();
+            personController.suscribeView("view1", mainFrame.getPersonPanel());
+            personController.suscribeView("view2", mainFrame.getPersonForm());
+            searchPersonController.suscribeView(mainFrame.getPersonPanel().getSearchPeopleTxt(), mainFrame.getPersonPanel());
+            cityController.suscribeView("view2", mainFrame.getPersonForm());
+            communeController.suscribeView("view2", mainFrame.getPersonForm());
+            neighborhoodController.suscribeView("view2", mainFrame.getPersonForm());
+            
+            mainFrame.getPersonPanel().addKeyStrokeListener(searchPersonController);
+            mainFrame.getPersonForm().addActionListener(communeController);
+            mainFrame.getPersonForm().addActionListener(cityController);
+            mainFrame.getPersonForm().addActionListener(personController);
+            mainFrame.getPersonForm().addActionListener(neighborhoodController);
+            mainFrame.getPersonPanel().addActionListener(personController);
+            mainFrame.getUbicacionPanel().getCiudadForm().setCiudadController(cityController);
+            mainFrame.getUbicacionPanel().getBarrioForm().setBarrioController(neighborhoodController);
             
             java.awt.EventQueue.invokeLater(() -> {
                 mainFrame.setVisible(true);

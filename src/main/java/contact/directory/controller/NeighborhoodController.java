@@ -1,14 +1,17 @@
 package contact.directory.controller;
 
+import contact.directory.view.interfaces.NeighborhoodView;
 import contact.directory.enums.ValidationMessage;
 import contact.directory.exception.ValidationException;
 import contact.directory.model.Neighborhood;
 import contact.directory.model.Commune;
 import contact.directory.service.NeighborhoodService;
-import contact.directory.view.form.NeighborhoodForm;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  *
@@ -16,41 +19,38 @@ import javax.swing.JOptionPane;
  */
 public class NeighborhoodController implements ActionListener {
 
-    private final NeighborhoodForm view;
     private final NeighborhoodService neighborhoodService;
+    private final Map<String, NeighborhoodView> viewRegistry;
 
-    public NeighborhoodController(NeighborhoodForm view, NeighborhoodService neighborhoodService) {
-        this.view = view;
+    public NeighborhoodController(NeighborhoodService neighborhoodService) {
         this.neighborhoodService = neighborhoodService;
+        viewRegistry = new HashMap<>();
+    }
+    
+    public void suscribeView(String viewId, NeighborhoodView neighborhoodView) {
+        viewRegistry.put(viewId, neighborhoodView);
+        loadNeighborhoodByCommune(neighborhoodView, neighborhoodView.getNeighborhoodData().getCommune());
     }
 
-    public void init() {
-        view.setActionListener(this);
-    }
-
-    public String getNeighborhoodByCommune(Commune commune) {
-        try {
-
-            if (commune == null) {
-                throw new ValidationException(ValidationMessage.COMUNA_INVALIDA.getMessage());
-            }
-            view.cargarBarrios(neighborhoodService.getNeighborhoodByCommune(commune.getId()));
-
-        } catch (ValidationException e) {
-            return e.getMessage();
+    public void loadNeighborhoodByCommune(NeighborhoodView neighborhoodView, Commune commune) {
+        if(commune == null){
+            neighborhoodView.loadNeighborhoodByCommune(new ArrayList<>());
+        } else {
+            neighborhoodView.loadNeighborhoodByCommune(neighborhoodService.getNeighborhoodByCommune(commune.getId()));
         }
-        return ValidationMessage.OPERACION_EXITOSA.getMessage();
     }
 
-    public String searchNeighborhoodByCommune(Commune commune, String key) {
+    public String searchNeighborhoodByCommune(NeighborhoodView neighborhoodView, Commune commune) {
         try {
+            
+            String key = neighborhoodView.getSearchTxtNeigborhood();
 
             if (commune == null) {
                 throw new ValidationException(ValidationMessage.COMUNA_INVALIDA.getMessage());
             }
-
-            view.cargarBarrios(neighborhoodService.searchNeighborhoodByCommune(commune, key));
-
+            
+            neighborhoodView.loadNeighborhoodByCommune(neighborhoodService.searchNeighborhoodByCommune(commune, key));
+            
         } catch (ValidationException e) {
             return e.getMessage();
         }
@@ -59,6 +59,7 @@ public class NeighborhoodController implements ActionListener {
     }
 
     public void saveNeightborhood() {
+        /*
         try {
 
             Neighborhood neighborhood = view.getBarrio();
@@ -94,21 +95,34 @@ public class NeighborhoodController implements ActionListener {
                 null,
                 ValidationMessage.BARRIO_GUARDADO.getMessage()
         );
+         */
     }
 
     public String deleteNeighborhood(Neighborhood neighborhood) {
         neighborhoodService.delete(neighborhood.getId());
         int id = neighborhood.getCommune().getId();
-        view.cargarBarrios(neighborhoodService.getNeighborhoodByCommune(id));
+        //view.cargarBarrios(neighborhoodService.getNeighborhoodByCommune(id));
         return ValidationMessage.BARRIO_ELIMINADO.getMessage();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String actionCommand = e.getActionCommand();
+         
+        String[] parts = e.getActionCommand().split("_");
 
-        if (actionCommand.equals("Guardar")) {
-            saveNeightborhood();
+        String command = parts[1];
+        
+        NeighborhoodView neighborhoodView = viewRegistry.get(parts[0]);
+
+        switch (command) {
+            case "Guardar":
+                saveNeightborhood();
+                break;
+            case "searchNeighborhood":
+                
+            case "communeComboBox":
+                loadNeighborhoodByCommune(neighborhoodView, neighborhoodView.getNeighborhoodData().getCommune());
+                break;
         }
     }
 

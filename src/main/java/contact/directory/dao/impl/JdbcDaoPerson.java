@@ -119,6 +119,7 @@ public class JdbcDaoPerson implements PersonDao {
     @Override
     public List<Person> getByKey(String key) {
         String sql = "SELECT "
+                + "p.id as persona_id, " 
                 + "p.primer_nombre as primerNombre, "
                 + "p.segundo_nombre as segundoNombre, "
                 + "p.primer_apellido as primerApellido, "
@@ -152,7 +153,7 @@ public class JdbcDaoPerson implements PersonDao {
 
                 List<Person> people = new ArrayList<>();
                 while (resultSet.next()) {
-
+                    int personaId = resultSet.getInt("persona_id");
                     String primerNombre = resultSet.getString("primerNombre");
                     String segundoNombre = resultSet.getString("segundoNombre");
                     String primerApellido = resultSet.getString("primerApellido");
@@ -180,7 +181,7 @@ public class JdbcDaoPerson implements PersonDao {
                     );
 
                     Person person = new Person(
-                            -1,
+                            personaId,
                             cedula,
                             primerNombre,
                             segundoNombre,
@@ -257,7 +258,13 @@ public class JdbcDaoPerson implements PersonDao {
 
     @Override
     public void delete(Integer id) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        String sql = "DELETE FROM persona WHERE id = ?";
+        try (Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
     }
 
     @Override
@@ -287,11 +294,11 @@ public class JdbcDaoPerson implements PersonDao {
     public boolean isPhoneInUse(String phone) {
         String sql = "SELECT COUNT(*) FROM persona WHERE telefono = ?";
         try (Connection connection = dataSource.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            
+
             preparedStatement.setString(1, phone);
-            
+
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                
+
                 if (resultSet.next()) {
                     int count = resultSet.getInt(1);
                     return count > 0;

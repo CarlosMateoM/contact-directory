@@ -1,15 +1,12 @@
 package contact.directory.controller;
 
-import contact.directory.enums.ValidationMessage;
-import contact.directory.exception.DatabaseAccessException;
-import contact.directory.exception.ServiceException;
-import contact.directory.exception.ValidationException;
+import contact.directory.view.interfaces.PersonView;
 import contact.directory.model.Person;
-import contact.directory.view.form.PersonForm;
 import contact.directory.service.PersonService;
-import contact.directory.view.PersonPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -17,79 +14,62 @@ import java.awt.event.ActionListener;
  */
 public class PersonController implements ActionListener {
 
-    private final PersonForm form;
-    private final PersonPanel view;
+    private final Map<String, PersonView> viewRegistry;
     private final PersonService personService;
 
-    public PersonController(
-            PersonForm form,
-            PersonPanel view,
-            PersonService personaService
-    ) {
-        this.form = form;
-        this.view = view;
-        this.personService = personaService;
+    public PersonController(PersonService personService) {
+        this.personService = personService;
+        viewRegistry = new HashMap<>();
     }
 
-    public void initView() {
-        
-        loadPeopleAndUpdateView();
-        //form.cargarCiudades(ciudadService.getAll());
+    public void suscribeView(String viewId, PersonView peopleView) {
+        this.viewRegistry.put(viewId, peopleView);
+        loadPeopleAndUpdateView(peopleView);
     }
 
-    public String loadPeopleAndUpdateView() {
-        try {
-            view.cargarVontantes(personService.getAll());
-        } catch (DatabaseAccessException e) {
-            return e.getMessage();
+    public void loadPeopleAndUpdateView(PersonView peopleView) {
+        peopleView.loadPeopleInView(personService.getAll());
+    }
+
+    public void loadPeopleAndUpdateViews() {
+        for (String viewId : viewRegistry.keySet()) {
+            PersonView peopleView = viewRegistry.get(viewId);
+            loadPeopleAndUpdateView(peopleView);
         }
-        return ValidationMessage.OPERACION_EXITOSA.getMessage();
     }
 
-    public String savePerson(Person person) {
-        try {
-            if (!person.isValid() || !person.getAddress().isValid()) {
-                throw new ValidationException(ValidationMessage.CAMPOS_OBLIGATORIOS.getMessage());
-            }
-            personService.save(person);
-            loadPeopleAndUpdateView();
-        } catch (DatabaseAccessException | ValidationException e) {
-            return e.getMessage();
+    public void savePerson(PersonView personView) {
+        Person person = personView.getPersonData();
+        personService.save(person);
+        loadPeopleAndUpdateViews();
+    }
+
+    public void deletePerson(PersonView personView) {
+        Person person = personView.getPersonData();
+        if(person != null){
+            System.out.println(person.getId());
+            personService.delete(person.getId());
+            loadPeopleAndUpdateViews();
         }
-        return ValidationMessage.VOTANTE_GUARDADO.getMessage();
     }
 
-    public String searchPeople(String key) {
-        try {
-            view.cargarVontantes(personService.getByKey(key));
-        } catch (ServiceException e) {
-            return e.getMessage();
-        }
-        return ValidationMessage.OPERACION_EXITOSA.getMessage();
-    }
-
-    /*
-    public void onCommuneSelected(Commune commune) {
-        List<Neighborhood> barrios = barrioService.getNeighborhoodByCommune(commune.getId());
-        form.cargarBarrios(barrios);
-    }
-    
-    public void onCitySelected(City city) {
-        List<Commune> comunas = comunaService.getCommunesByCity(city.getId());
-        form.cargarComunas(comunas);
-    }
-     */
     @Override
     public void actionPerformed(ActionEvent e) {
-        String command = e.getActionCommand();
+
+        String[] parts = e.getActionCommand().split("_");
+
+        String command = parts[1];
+
+        PersonView view = viewRegistry.get(parts[0]);
 
         switch (command) {
-            case "save": if(true);
+            case "save":
+                savePerson(view);
                 break;
-            case "unsaved" : if(true);
+            case "delete":
+                deletePerson(view);
                 break;
         }
 
     }
 }
-    

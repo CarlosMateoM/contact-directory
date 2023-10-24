@@ -1,11 +1,14 @@
 package contact.directory.view.form;
 
+import contact.directory.view.interfaces.ActionListenerRegistration;
 import contact.directory.controller.CommuneController;
+import contact.directory.view.interfaces.CommuneView;
 import contact.directory.enums.ValidationMessage;
 import contact.directory.exception.ValidationException;
 import contact.directory.model.City;
 import contact.directory.model.Commune;
 import contact.directory.view.model.ComunaTableModel;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -14,12 +17,11 @@ import javax.swing.event.ListSelectionEvent;
  *
  * @author C.Mateo
  */
-public class CommuneForm extends javax.swing.JPanel {
+public class CommuneForm extends javax.swing.JPanel implements ActionListenerRegistration, CommuneView{
 
     private City ciudad;
     private NeighborhoodForm barrioForm;
     private ComunaTableModel tableComunas;
-    private CommuneController comunaController;
 
     /**
      * Creates new form ComunaForm
@@ -56,15 +58,11 @@ public class CommuneForm extends javax.swing.JPanel {
     public void setCiudad(City ciudad) {
         this.ciudad = ciudad;
         ciudadNameLb.setText(ciudad.getName());
-        comunaController.getCommunesByCity(ciudad);
+        //comunaController.getCommunesByCity(ciudad);
     }
 
     public void setBarrioForm(NeighborhoodForm barrioForm) {
         this.barrioForm = barrioForm;
-    }
-
-    public void setComunacontroller(CommuneController comunaController) {
-        this.comunaController = comunaController;
     }
 
     public void cargarComunas(List<Commune> listaComunas) {
@@ -186,7 +184,7 @@ public class CommuneForm extends javax.swing.JPanel {
         // TODO add your handling code here:
         String nombre = nombreTxt.getText();
         Commune comuna = new Commune(-1, nombre, ciudad);
-        String response = comunaController.saveCommune(comuna);
+        String response = "";//comunaController.saveCommune(comuna);
         if (response.equals(ValidationMessage.COMUNA_GUARDADA.getMessage())) {
             nombreTxt.setText("");
         }
@@ -205,9 +203,9 @@ public class CommuneForm extends javax.swing.JPanel {
                 String key = buscarTxt.getText();
 
                 if (!key.isEmpty()) {
-                    response = comunaController.searchCommunesByCity(ciudad, key);
+                    response = "";//comunaController.searchCommunesByCity(ciudad, key);
                 } else {
-                    response = comunaController.getCommunesByCity(ciudad);
+                    response = "";//comunaController.getCommunesByCity(ciudad);
                 }
 
                 if (!response.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
@@ -225,7 +223,7 @@ public class CommuneForm extends javax.swing.JPanel {
         // TODO add your handling code here:
         int index = jTableComunas.getSelectedRow();
         Commune comuna = tableComunas.getListaComunas().get(index);
-        String response = comunaController.deleteCommune(comuna);
+        String response = "";//comunaController.deleteCommune(comuna);
         javax.swing.JOptionPane.showMessageDialog(null, response);
     }//GEN-LAST:event_jButton4ActionPerformed
 
@@ -241,5 +239,20 @@ public class CommuneForm extends javax.swing.JPanel {
     private javax.swing.JTable jTableComunas;
     private javax.swing.JTextField nombreTxt;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void addActionListener(ActionListener actionListener) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void loadCommuneInView(List<Commune> communes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public Commune getCommuneData() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
 }

@@ -1,23 +1,25 @@
 package contact.directory.view;
 
-import contact.directory.controller.PersonController;
-import contact.directory.enums.ValidationMessage;
+import contact.directory.view.interfaces.ActionListenerRegistration;
 import contact.directory.model.Person;
+import contact.directory.view.components.JTextFieldKeyReleased;
 import contact.directory.view.form.PersonForm;
+import contact.directory.view.interfaces.KeyReleasedListener;
 import contact.directory.view.model.PersonaTableModel;
+import java.awt.event.ActionListener;
 import java.util.List;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import javax.swing.SwingUtilities;
+import contact.directory.view.interfaces.PersonView;
 
 /**
  *
  * @author C.Mateo
  */
-public class PersonPanel extends javax.swing.JPanel {
+public class PersonPanel extends javax.swing.JPanel implements PersonView, ActionListenerRegistration {
 
-    private PersonForm votanteForm;
-    private PersonController votanteController;
+    private PersonForm personForm;
     private PersonaTableModel tablaVotantes;
 
     /**
@@ -33,21 +35,66 @@ public class PersonPanel extends javax.swing.JPanel {
         jTableVotantes.setModel(tablaVotantes);
     }
 
-    public void setVotanteController(PersonController votanteController) {
-        this.votanteController = votanteController;
+    public void setPersonForm(PersonForm personForm) {
+        this.personForm = personForm;
     }
 
-    public void setVotanteForm(PersonForm votanteForm) {
-        this.votanteForm = votanteForm;
-    }
-
-    public void cargarVontantes(List<Person> personas) {
+    @Override
+    public void loadPeopleInView(List<Person> people) {
         SwingUtilities.invokeLater(() -> {
-            tablaVotantes.setListaPersonas(personas);
-            totalRegistrosLb.setText(
-                    String.format("%d Registros ", personas.size())
-            );
+            tablaVotantes.setListaPersonas(people);
+            updateTotalPeopleLabel(people.size());
         });
+    }
+
+    private void updateTotalPeopleLabel(int size) {
+        String text = String.format("%d Registros ", size);
+        totalRegistrosLb.setText(text);
+    }
+
+    @Override
+    public Person getPersonToDelete() {
+        return null;
+    }
+
+    @Override
+    public void addActionListener(ActionListener actionListener) {
+        deletePersonBtn.addActionListener(actionListener);
+    }
+
+    public void addKeyStrokeListener(KeyReleasedListener keyReleasedListener) {
+        searchPeopleTxt.setKeyReleasedListener(keyReleasedListener);
+    }
+
+    public JTextFieldKeyReleased getSearchPeopleTxt() {
+        return searchPeopleTxt;
+    }
+
+    @Override
+    public String getSearchTextPerson() {
+        return searchPeopleTxt.getText();
+    }
+
+    @Override
+    public Person getPersonData() {
+        Person person;
+        int selectedRow = jTableVotantes.getSelectedRow();
+        if (selectedRow >= 0) {
+            person = tablaVotantes.getListaPersonas().get(selectedRow);
+
+            int selectedOption = javax.swing.JOptionPane.showConfirmDialog(null,
+                    String.format("¿Desea eliminar la persona de nombre %s %s?", person.getFirstName(), person.getLastName()),
+                    "Seleccione una opción",
+                    YES_NO_OPTION,
+                    WARNING_MESSAGE
+            );
+
+            if (selectedOption == javax.swing.JOptionPane.YES_OPTION) {
+                return person;
+            }
+
+        }
+        return null;
     }
 
     /**
@@ -61,11 +108,11 @@ public class PersonPanel extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableVotantes = new javax.swing.JTable();
-        jButton2 = new javax.swing.JButton();
-        buscarTxt = new javax.swing.JTextField();
+        addPersonBtn = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         totalRegistrosLb = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
+        deletePersonBtn = new javax.swing.JButton();
+        searchPeopleTxt = new contact.directory.view.components.JTextFieldKeyReleased();
 
         setBackground(new java.awt.Color(255, 255, 255));
 
@@ -80,16 +127,10 @@ public class PersonPanel extends javax.swing.JPanel {
         jTableVotantes.setRowHeight(30);
         jScrollPane1.setViewportView(jTableVotantes);
 
-        jButton2.setText("Nuevo");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        addPersonBtn.setText("Nuevo");
+        addPersonBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        buscarTxt.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                buscarTxtKeyReleased(evt);
+                addPersonBtnActionPerformed(evt);
             }
         });
 
@@ -99,10 +140,12 @@ public class PersonPanel extends javax.swing.JPanel {
         totalRegistrosLb.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         totalRegistrosLb.setText("0 Registros");
 
-        jButton3.setText("Eliminar");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        deletePersonBtn.setText("Eliminar");
+        deletePersonBtn.setActionCommand("view1_delete");
+
+        searchPeopleTxt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                searchPeopleTxtActionPerformed(evt);
             }
         });
 
@@ -115,13 +158,13 @@ public class PersonPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(searchPeopleTxt, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, 0)
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 442, Short.MAX_VALUE)
-                        .addComponent(jButton3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 438, Short.MAX_VALUE)
+                        .addComponent(deletePersonBtn)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton2))
+                        .addComponent(addPersonBtn))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(totalRegistrosLb, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -133,10 +176,10 @@ public class PersonPanel extends javax.swing.JPanel {
                 .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton2)
-                        .addComponent(buscarTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton3))
-                    .addComponent(jLabel2))
+                        .addComponent(addPersonBtn)
+                        .addComponent(deletePersonBtn))
+                    .addComponent(jLabel2)
+                    .addComponent(searchPeopleTxt, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 478, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -145,63 +188,24 @@ public class PersonPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void addPersonBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPersonBtnActionPerformed
         // TODO add your handling code here:
-        new MainDialog(votanteForm, "Registro Nuevo Votante");
-    }//GEN-LAST:event_jButton2ActionPerformed
+        new MainDialog(personForm, "Registro Nuevo Votante");
+    }//GEN-LAST:event_addPersonBtnActionPerformed
 
-    private void buscarTxtKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_buscarTxtKeyReleased
+    private void searchPeopleTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPeopleTxtActionPerformed
         // TODO add your handling code here:
-
-        Thread thread = new Thread() {
-
-            @Override
-            public void run() {
-
-                String mensaje;
-                String key = buscarTxt.getText();
-
-                if (!key.isEmpty()) {
-                    mensaje = votanteController.searchPeople(key);
-                } else {
-                    mensaje = votanteController.loadPeopleAndUpdateView();
-                }
-
-                if (!mensaje.equals(ValidationMessage.OPERACION_EXITOSA.getMessage())) {
-                    javax.swing.JOptionPane.showMessageDialog(null, mensaje);
-                }
-            }
-
-        };
-
-        thread.start();
-
-    }//GEN-LAST:event_buscarTxtKeyReleased
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
-
-        int selectedRow = jTableVotantes.getSelectedRow();
-        if (selectedRow >= 0) {
-            Person persona = tablaVotantes.getListaPersonas().get(selectedRow);
-            int selectedOption = javax.swing.JOptionPane.showConfirmDialog(null, 
-                    String.format("¿Desea eliminar la persona de nombre %s %s?", persona.getFirstName(), persona.getLastName()),
-                    "Seleccione una opción",
-                    YES_NO_OPTION,
-                    WARNING_MESSAGE
-            );
-            //Implementación para eliminar un registro
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_searchPeopleTxtActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField buscarTxt;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton addPersonBtn;
+    private javax.swing.JButton deletePersonBtn;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableVotantes;
+    private contact.directory.view.components.JTextFieldKeyReleased searchPeopleTxt;
     private javax.swing.JLabel totalRegistrosLb;
     // End of variables declaration//GEN-END:variables
+
 }

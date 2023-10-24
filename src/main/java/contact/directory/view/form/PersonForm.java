@@ -1,37 +1,67 @@
 package contact.directory.view.form;
 
-import contact.directory.controller.CitySelected;
-import contact.directory.controller.PersonController;
-import contact.directory.enums.ValidationMessage;
+import contact.directory.view.interfaces.ActionListenerRegistration;
+import contact.directory.view.interfaces.CityView;
+import contact.directory.view.interfaces.CommuneView;
+import contact.directory.view.interfaces.NeighborhoodView;
 import contact.directory.model.Neighborhood;
 import contact.directory.model.City;
 import contact.directory.model.Commune;
 import contact.directory.model.Address;
 import contact.directory.model.Person;
-import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+import contact.directory.view.interfaces.PersonView;
 
 /**
  *
  * @author C.Mateo
  */
-public class PersonForm extends javax.swing.JPanel {
-
-    private CitySelected citySelected;
-    private PersonController votanteController;
+public class PersonForm extends javax.swing.JPanel
+        implements
+        PersonView,
+        CityView,
+        CommuneView,
+        NeighborhoodView,
+        ActionListenerRegistration {
 
     /**
      * Creates new form VontanteForm
      */
     public PersonForm() {
         initComponents();
+        ciudadComboBox.getComboBox().setActionCommand("view2_cityComboBox");
+        comunaComboBox.getComboBox().setActionCommand("view2_communeComboBox");
+    }
+    
+    @Override
+    public City getCityData() {
+        City selectedCity = (City) ciudadComboBox.getComboBox().getSelectedItem();
+        return selectedCity;
     }
 
-    public void setController(PersonController votanteController) {
-        this.votanteController = votanteController;
-    
-        init();
+    @Override
+    public Commune getCommuneData() {
+        Commune commune = new Commune();
+        City selectedCity = (City) ciudadComboBox.getComboBox().getSelectedItem();
+        commune.setCity(selectedCity);
+        return commune;
     }
+
+    @Override
+    public void loadNeighborhoodByCommune(List<Neighborhood> neighborhoods) {
+        barrioComboBox.loadItems(neighborhoods);
+    }
+
+    @Override
+    public Neighborhood getNeighborhoodData() {
+        Neighborhood neighborhood = new Neighborhood();
+        Commune communeSelected = (Commune) comunaComboBox.getComboBox().getSelectedItem();
+        neighborhood.setCommune(communeSelected);
+        return neighborhood;
+    }
+
+    /*
 
     private void init() {
         ciudadComboBox.getComboBox().addActionListener((ActionEvent e) -> {
@@ -40,26 +70,29 @@ public class PersonForm extends javax.swing.JPanel {
                 citySelected.onCitySelected(ciudadSeleccionada);
             }
         });
-        /*
         comunaComboBox.getComboBox().addActionListener((ActionEvent e) -> {
             Commune comunaSeleccionada = (Commune) comunaComboBox.getComboBox().getSelectedItem();
             if (comunaSeleccionada != null) {
                 votanteController.onCommuneSelected(comunaSeleccionada);
             }
         });
-        */
+    }
+     */
+    @Override
+    public void addActionListener(ActionListener actionListener) {
+        savePersonBtn.addActionListener(actionListener);
+        ciudadComboBox.getComboBox().addActionListener(actionListener);
+        comunaComboBox.getComboBox().addActionListener(actionListener);
     }
 
-    public void cargarCiudades(List<City> ciudades) {
-        ciudadComboBox.loadItems(ciudades);
+    @Override
+    public void loadCommuneInView(List<Commune> communes) {
+        comunaComboBox.loadItems(communes);
     }
 
-    public void cargarComunas(List<Commune> comunas) {
-        comunaComboBox.loadItems(comunas);
-    }
-
-    public void cargarBarrios(List<Neighborhood> barrios) {
-        barrioComboBox.loadItems(barrios);
+    @Override
+    public void loadCitiesInView(List<City> cities) {
+        ciudadComboBox.loadItems(cities);
     }
 
     public void limpiarCampos() {
@@ -73,6 +106,36 @@ public class PersonForm extends javax.swing.JPanel {
         carreraTxt.setText("");
         numeroTxt.setText("");
         sobreTxt.setText("");
+    }
+
+    @Override
+    public Person getPersonData() {
+        String primerNombre = primerNombreTxt.getText();
+        String segundoNombre = segundoNombreTxt.getText();
+        String primerApellido = primerApellidoTxt.getText();
+        String segundoApellido = segundoApellidoTxt.getText();
+        String cedula = cedulaTxt.getText();
+        String telefono = telefonoTxt.getText();
+
+        Neighborhood neighborhood = (Neighborhood) barrioComboBox.getComboBox().getSelectedItem();
+        String calle = calleTxt.getText();
+        String carrera = carreraTxt.getText();
+        String numero = numeroTxt.getText();
+        String sobre = sobreTxt.getText();
+
+        Address address = new Address(-1, calle, carrera, numero, sobre, neighborhood);
+
+        Person person = new Person(
+                -1,
+                cedula,
+                primerNombre,
+                segundoNombre,
+                primerApellido,
+                segundoApellido,
+                telefono,
+                address);
+
+        return person;
     }
 
     /**
@@ -99,7 +162,7 @@ public class PersonForm extends javax.swing.JPanel {
         jLabel10 = new javax.swing.JLabel();
         numeroTxt = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        savePersonBtn = new javax.swing.JButton();
         sobreTxt = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         cedulaTxt = new javax.swing.JTextField();
@@ -157,10 +220,11 @@ public class PersonForm extends javax.swing.JPanel {
         jLabel11.setForeground(new java.awt.Color(51, 51, 51));
         jLabel11.setText("Sobre:");
 
-        jButton1.setText("Guardar");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        savePersonBtn.setText("Guardar");
+        savePersonBtn.setActionCommand("view2_save");
+        savePersonBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                savePersonBtnActionPerformed(evt);
             }
         });
 
@@ -184,7 +248,7 @@ public class PersonForm extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(30, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton1)
+                    .addComponent(savePersonBtn)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 930, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -289,7 +353,7 @@ public class PersonForm extends javax.swing.JPanel {
                 .addGap(6, 6, 6)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
+                .addComponent(savePersonBtn)
                 .addGap(12, 12, 12)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -303,41 +367,9 @@ public class PersonForm extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_numeroTxtActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String primerNombre = primerNombreTxt.getText();
-        String segundoNombre = segundoNombreTxt.getText();
-        String primerApellido = primerApellidoTxt.getText();
-        String segundoApellido = segundoApellidoTxt.getText();
-        String cedula = cedulaTxt.getText();
-        String telefono = telefonoTxt.getText();
+    private void savePersonBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePersonBtnActionPerformed
 
-        Neighborhood barrio = (Neighborhood) barrioComboBox.getComboBox().getSelectedItem();
-        String calle = calleTxt.getText();
-        String carrera = carreraTxt.getText();
-        String numero = numeroTxt.getText();
-        String sobre = sobreTxt.getText();
-
-        Address direccion = new Address(-1, calle, carrera, numero, sobre, barrio);
-
-        Person persona = new Person(
-                -1,
-                cedula,
-                primerNombre,
-                segundoNombre,
-                primerApellido,
-                segundoApellido,
-                telefono,
-                direccion);
-
-        String response = votanteController.savePerson(persona);
-        
-        if (response.equals(ValidationMessage.VOTANTE_GUARDADO.getMessage())) {
-            limpiarCampos();
-        }
-
-        javax.swing.JOptionPane.showMessageDialog(null, response);
-
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_savePersonBtnActionPerformed
 
     private void calleTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calleTxtActionPerformed
         // TODO add your handling code here:
@@ -351,7 +383,6 @@ public class PersonForm extends javax.swing.JPanel {
     private javax.swing.JTextField cedulaTxt;
     private contact.directory.view.components.CiudadComboBox ciudadComboBox;
     private contact.directory.view.components.ComunaComboBox comunaComboBox;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -369,10 +400,30 @@ public class PersonForm extends javax.swing.JPanel {
     private javax.swing.JTextField numeroTxt;
     private javax.swing.JTextField primerApellidoTxt;
     private javax.swing.JTextField primerNombreTxt;
+    private javax.swing.JButton savePersonBtn;
     private javax.swing.JTextField segundoApellidoTxt;
     private javax.swing.JTextField segundoNombreTxt;
     private javax.swing.JTextField sobreTxt;
     private javax.swing.JTextField telefonoTxt;
     // End of variables declaration//GEN-END:variables
 
+
+    @Override
+    public void loadPeopleInView(List<Person> people) {
+    }
+
+    @Override
+    public String getSearchTxtNeigborhood() {
+        return "";
+    }
+    
+    @Override
+    public String getSearchTextPerson() {
+        return "";
+    }
+
+    @Override
+    public Person getPersonToDelete() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

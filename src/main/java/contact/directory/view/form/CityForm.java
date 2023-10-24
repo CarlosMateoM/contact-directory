@@ -166,7 +166,7 @@ public class CityForm extends javax.swing.JPanel {
         String response = ciudadController.saveCity(ciudad);
         if (response.equals(ValidationMessage.CIUDAD_GUARDADA.getMessage())) {
             nombreTxt.setText("");
-            ciudadController.loadCitiesAndUpdateView();
+            //ciudadController.loadCitiesAndUpdateView();
         }
         javax.swing.JOptionPane.showMessageDialog(null, response);
     }//GEN-LAST:event_jButton2ActionPerformed
@@ -180,7 +180,7 @@ public class CityForm extends javax.swing.JPanel {
                 if (!key.isEmpty()) {
                     ciudadController.searchCity(key);
                 } else {
-                    ciudadController.loadCitiesAndUpdateView();
+                    //ciudadController.loadCitiesAndUpdateView();
                 }
             }
         };
