@@ -1,7 +1,6 @@
 package contact.directory.controller;
 
 import contact.directory.service.PersonService;
-import contact.directory.view.components.JTextFieldKeyReleased;
 import contact.directory.view.interfaces.KeyReleasedListener;
 import contact.directory.view.interfaces.PersonView;
 import java.awt.Component;
@@ -44,7 +43,7 @@ public class SearchPersonController implements KeyReleasedListener {
 
             }
         };
-
+        
         thread.start();
     }
 

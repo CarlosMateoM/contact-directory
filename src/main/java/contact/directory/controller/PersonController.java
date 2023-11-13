@@ -22,19 +22,28 @@ public class PersonController implements ActionListener {
         viewRegistry = new HashMap<>();
     }
 
-    public void suscribeView(String viewId, PersonView peopleView) {
-        this.viewRegistry.put(viewId, peopleView);
-        loadPeopleAndUpdateView(peopleView);
+    public void suscribeView(String viewId, PersonView personView) {
+        this.viewRegistry.put(viewId, personView);
+        loadPeopleAndUpdateView(personView);
     }
 
-    public void loadPeopleAndUpdateView(PersonView peopleView) {
-        peopleView.loadPeopleInView(personService.getAll());
+    public void loadPeopleAndUpdateView(PersonView personView) {
+        personView.loadPeopleInView(personService.getAll());
     }
 
     public void loadPeopleAndUpdateViews() {
         for (String viewId : viewRegistry.keySet()) {
-            PersonView peopleView = viewRegistry.get(viewId);
-            loadPeopleAndUpdateView(peopleView);
+            PersonView personView = viewRegistry.get(viewId);
+            loadPeopleAndUpdateView(personView);
+        }
+    }
+    
+    public void updateViewAfterDeletePerson(PersonView personView){
+        String key = personView.getSearchTextPerson();
+        if(key.isEmpty()){
+            loadPeopleAndUpdateView(personView);
+        } else {
+            personView.loadPeopleInView(personService.getByKey(key));
         }
     }
 
@@ -49,17 +58,15 @@ public class PersonController implements ActionListener {
         if(person != null){
             System.out.println(person.getId());
             personService.delete(person.getId());
-            loadPeopleAndUpdateViews();
+            updateViewAfterDeletePerson(personView);
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        
         String[] parts = e.getActionCommand().split("_");
-
         String command = parts[1];
-
         PersonView view = viewRegistry.get(parts[0]);
 
         switch (command) {
@@ -70,6 +77,5 @@ public class PersonController implements ActionListener {
                 deletePerson(view);
                 break;
         }
-
     }
 }
